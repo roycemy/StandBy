@@ -45,8 +45,7 @@
     try {
       const query = buildQuery();
       const url = "https://www.google.com/travel/flights?hl=en-US&curr=USD&q=" + encodeURIComponent(query);
-      const opened = window.open(url, "_blank", "noopener,noreferrer");
-      if (!opened) window.location.href = url;
+      window.location.href = url;
     } catch (e) { error.textContent = e.message; }
   }
 
