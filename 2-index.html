@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StandBy - See where you can go this week</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="brand">
+    <span class="logo">StandBy</span>
+    <span class="tagline">See where you can go this week.</span>
+  </div>
+  <span class="demo-badge">Prototype &middot; simulated data &middot; no live fares</span>
+</header>
+
+<nav class="tabs">
+  <button id="tab-discover" class="tab" type="button">Discover</button>
+  <button id="tab-search" class="tab" type="button">Search</button>
+</nav>
+
+<section class="controls">
+  <div class="control-row">
+    <label>From</label>
+    <div id="origin-chips" class="chips"></div>
+  </div>
+  <div class="control-row" id="dest-row">
+    <label>To</label>
+    <div id="dest-chips" class="chips"></div>
+  </div>
+  <div class="control-row dates">
+    <label>Dates</label>
+    <input type="date" id="date-from">
+    <span class="dash">&ndash;</span>
+    <input type="date" id="date-to">
+    <select id="priority" title="Ranking preference">
+      <option value="balanced">Balanced</option>
+      <option value="price">Price first</option>
+      <option value="schedule">Schedule first</option>
+    </select>
+  </div>
+</section>
+
+<p id="results-note" class="results-note"></p>
+<main id="results" class="grid"></main>
+
+<footer class="site-footer">
+  <p>StandBy is a prototype. Every fare, seat count, and probability on this page is
+  simulated for demonstration. Nothing here is a live price, a real booking, or
+  travel advice.</p>
+</footer>
+
+<div class="overlay" id="detail">
+  <div class="sheet">
+    <button class="close" type="button" aria-label="Close">&times;</button>
+    <div id="detail-body"></div>
+  </div>
+</div>
+
+<div class="overlay" id="booking">
+  <div class="sheet">
+    <button class="close" type="button" aria-label="Close">&times;</button>
+    <div id="booking-body"></div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
