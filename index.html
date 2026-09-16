@@ -2,21 +2,21 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Search current flight schedules and fares, then verify standby eligibility with the airline.">
-<title>StandBy - Live flight search</title>
-<link rel="stylesheet" href="styles.css?v=80862d8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Compare modeled standby opportunity across flights, then check current fares.">
+<title>StandBy - Compare flight opportunity</title>
+<link rel="stylesheet" href="styles.css?v=20260916b">
 </head>
 <body>
 <header class="site-header">
-  <div class="brand"><span class="logo">StandBy</span><span class="tagline">Find a flight you can actually take.</span></div>
-  <span class="live-badge"><i></i> Live search beta</span>
+  <a class="brand" href="#top" aria-label="StandBy home">StandBy</a>
+  <span class="beta"><i></i> Modeled beta</span>
 </header>
-<main class="shell">
+<main id="top" class="shell">
   <section class="hero">
-    <p class="eyebrow">Real schedules. Current fares.</p>
-    <h1>Where can you go next?</h1>
-    <p class="lede">Search the live flight market through Google Flights. StandBy sends your route, dates, cabin and passenger count, then you compare current bookable options there.</p>
+    <p class="eyebrow">Plan the flight. See the tradeoffs.</p>
+    <h1>Find your best shot.</h1>
+    <p>Compare an honest, modeled opportunity estimate across flights. No fake seat counts. No pretending we can see an airline's standby list.</p>
   </section>
 
   <section class="search-card" aria-label="Flight search">
@@ -24,36 +24,40 @@
       <button class="toggle on" data-trip="round" type="button">Round trip</button>
       <button class="toggle" data-trip="oneway" type="button">One way</button>
     </div>
-    <div class="form-grid">
-      <label>From<input id="origin" value="BOS" maxlength="3" autocomplete="off" inputmode="text" aria-label="Origin airport code"></label>
+    <div class="route-row">
+      <label>From<input id="origin" value="BOS" maxlength="3" autocomplete="off" aria-label="Origin airport code"></label>
       <button id="swap" class="swap" type="button" aria-label="Swap airports">⇄</button>
-      <label>To<input id="destination" value="DFW" maxlength="3" autocomplete="off" inputmode="text" aria-label="Destination airport code"></label>
+      <label>To<input id="destination" value="DFW" maxlength="3" autocomplete="off" aria-label="Destination airport code"></label>
+    </div>
+    <div class="detail-grid">
       <label>Depart<input id="depart" type="date"></label>
       <label id="return-wrap">Return<input id="return" type="date"></label>
-      <label>Travelers<select id="travelers"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></label>
+      <label>Travelers<select id="travelers"><option>1</option><option>2</option><option>3</option><option>4</option></select></label>
       <label>Cabin<select id="cabin"><option value="economy">Economy</option><option value="premium economy">Premium economy</option><option value="business">Business</option><option value="first">First</option></select></label>
     </div>
-    <button id="search-live" class="primary" type="button">Search live fares <span>↗</span></button>
+    <button id="compare" class="primary" type="button">Compare flight opportunities</button>
     <p id="error" class="error" role="alert"></p>
-    <p class="provider-note">Results open on Google Flights, where prices and availability can change until ticketing.</p>
   </section>
 
-  <section class="status-grid">
-    <article><span class="status-icon live">✓</span><div><h2>Live now</h2><p>Current schedules, displayed fares, stops, duration and booking links from Google Flights.</p></div></article>
-    <article><span class="status-icon modeled">≈</span><div><h2>Coming with a data partner</h2><p>Route-level disruption signals and backup-flight scoring based on licensed schedule and operations feeds.</p></div></article>
-    <article><span class="status-icon unavailable">—</span><div><h2>Airline-controlled</h2><p>Open seats, passenger loads and standby clearance odds are not public inventory. We will not invent them.</p></div></article>
+  <section id="results" class="results" hidden aria-live="polite">
+    <div class="results-head">
+      <div><p class="eyebrow">Modeled results</p><h2 id="route-title">BOS to DFW</h2><p id="trip-summary"></p></div>
+      <span class="estimate-label">Estimates, not live loads</span>
+    </div>
+    <div id="flight-list" class="flight-list"></div>
+    <aside class="honesty">
+      <strong>What this score means</strong>
+      <p>Opportunity scores are directional model estimates based on route demand, typical capacity, schedule timing, seasonality, and disruption history. They are not live open-seat counts, airline standby lists, or guaranteed clearance odds. Current fares and schedules must be checked with the provider.</p>
+    </aside>
   </section>
 
-  <section class="truth-card">
-    <div><p class="eyebrow">How StandBy handles confidence</p><h2>Facts first. Estimates only when the inputs support them.</h2></div>
-    <ul>
-      <li><strong>Fare and itinerary</strong><span>Verified on the live provider before you book.</span></li>
-      <li><strong>Standby eligibility</strong><span>Depends on the airline, ticket, status and same-day policy.</span></li>
-      <li><strong>Clearance chance</strong><span>Requires airline load and priority-list data. Not shown until licensed access exists.</span></li>
-    </ul>
+  <section class="truth-strip">
+    <article><b>Shown here</b><span>Airline, route, timing, indicative fare and modeled opportunity factors.</span></article>
+    <article><b>Checked live</b><span>Current fare and schedule on Google Flights after you choose an option.</span></article>
+    <article><b>Not claimed</b><span>Live seats, passenger loads, standby priority or guaranteed clearance.</span></article>
   </section>
 </main>
-<footer><p>StandBy does not sell tickets yet. Live searches are completed by Google Flights and its airline or travel partners. Always verify fare rules and standby policy before purchase.</p></footer>
-<script src="app.js"></script>
+<footer>StandBy is a planning tool. Airlines control standby eligibility and clearance. Verify fare rules and same-day policy before purchase.</footer>
+<script src="app.js?v=20260916b"></script>
 </body>
 </html>
