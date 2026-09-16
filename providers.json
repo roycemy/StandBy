@@ -1,0 +1,20 @@
+{
+  "routes": [
+    {"origin": "BOS", "destination": "DFW", "days": 30},
+    {"origin": "PVD", "destination": "DFW", "days": 30}
+  ],
+  "providers": {
+    "licensed_json_api": {
+      "enabled": false,
+      "terms_reviewed": false,
+      "automation_permitted": false,
+      "requires_api_key": true,
+      "api_key_env": "STANDBY_PROVIDER_KEY",
+      "endpoint": "",
+      "mapper": "standby_v1",
+      "delay_seconds": 2,
+      "contact": "unset"
+    }
+  },
+  "alerts": {"high_probability": 0.75, "seat_drop": 4}
+}
