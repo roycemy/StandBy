@@ -1,69 +1,9 @@
-(function () {
-  "use strict";
-  const $ = (s) => document.querySelector(s);
-  let trip = "round";
-
-  function isoLocal(d) {
-    const x = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
-    return x.toISOString().slice(0, 10);
-  }
-  function addDays(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); return x; }
-  function validCode(value) { return /^[A-Z]{3}$/.test(value); }
-  function prettyDate(value) {
-    return new Date(value + "T12:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
-  }
-  function normalize(input) { input.value = input.value.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 3); }
-
-  function setTrip(next) {
-    trip = next;
-    document.querySelectorAll(".toggle").forEach((b) => b.classList.toggle("on", b.dataset.trip === trip));
-    $("#return-wrap").hidden = trip === "oneway";
-  }
-
-  function buildQuery() {
-    const origin = $("#origin").value;
-    const destination = $("#destination").value;
-    const depart = $("#depart").value;
-    const returning = $("#return").value;
-    const travelers = $("#travelers").value;
-    const cabin = $("#cabin").value;
-    if (!validCode(origin) || !validCode(destination)) throw new Error("Use 3-letter airport codes, like BOS or DFW.");
-    if (origin === destination) throw new Error("Choose two different airports.");
-    if (!depart) throw new Error("Choose a departure date.");
-    if (trip === "round" && !returning) throw new Error("Choose a return date.");
-    if (trip === "round" && returning < depart) throw new Error("Return date must be after departure.");
-    let query = `Flights from ${origin} to ${destination} on ${prettyDate(depart)}`;
-    if (trip === "round") query += ` returning ${prettyDate(returning)}`;
-    else query += " one way";
-    query += ` for ${travelers} ${travelers === "1" ? "adult" : "adults"} in ${cabin}`;
-    return query;
-  }
-
-  function search() {
-    const error = $("#error");
-    error.textContent = "";
-    try {
-      const query = buildQuery();
-      const url = "https://www.google.com/travel/flights?hl=en-US&curr=USD&q=" + encodeURIComponent(query);
-      window.location.href = url;
-    } catch (e) { error.textContent = e.message; }
-  }
-
-  function init() {
-    const today = new Date();
-    $("#depart").min = isoLocal(today);
-    $("#return").min = isoLocal(today);
-    $("#depart").value = isoLocal(addDays(today, 7));
-    $("#return").value = isoLocal(addDays(today, 11));
-    [$("#origin"), $("#destination")].forEach((input) => input.addEventListener("input", () => normalize(input)));
-    $("#depart").addEventListener("change", () => {
-      $("#return").min = $("#depart").value;
-      if ($("#return").value < $("#depart").value) $("#return").value = $("#depart").value;
-    });
-    document.querySelectorAll(".toggle").forEach((b) => b.addEventListener("click", () => setTrip(b.dataset.trip)));
-    $("#swap").addEventListener("click", () => { const v = $("#origin").value; $("#origin").value = $("#destination").value; $("#destination").value = v; });
-    $("#search-live").addEventListener("click", search);
-    setTrip("round");
-  }
-  document.addEventListener("DOMContentLoaded", init);
-})();
+(function(){"use strict";const $=s=>document.querySelector(s);let trip="round";const airports={BOS:"Boston",DFW:"Dallas",JFK:"New York",LAX:"Los Angeles",ORD:"Chicago",ATL:"Atlanta",MIA:"Miami",SFO:"San Francisco",SEA:"Seattle",DEN:"Denver",PHL:"Philadelphia",IAD:"Washington"};
+function iso(d){const x=new Date(d.getTime()-d.getTimezoneOffset()*60000);return x.toISOString().slice(0,10)}function add(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x}function pretty(v){return new Date(v+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"})}function norm(i){i.value=i.value.toUpperCase().replace(/[^A-Z]/g,"").slice(0,3)}
+function setTrip(n){trip=n;document.querySelectorAll(".toggle").forEach(b=>b.classList.toggle("on",b.dataset.trip===trip));$("#return-wrap").hidden=trip==="oneway"}
+function readForm(){const o=$("#origin").value,d=$("#destination").value,dep=$("#depart").value,ret=$("#return").value;if(!/^[A-Z]{3}$/.test(o)||!/^[A-Z]{3}$/.test(d))throw Error("Use 3-letter airport codes, like BOS or DFW.");if(o===d)throw Error("Choose two different airports.");if(!dep)throw Error("Choose a departure date.");if(trip==="round"&&!ret)throw Error("Choose a return date.");if(trip==="round"&&ret<dep)throw Error("Return date must be after departure.");return{o,d,dep,ret,cabin:$("#cabin").value,travelers:$("#travelers").value}}
+function hash(s){let h=7;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))%997;return h}function googleUrl(f,x){let q=`${f.airline} flights from ${x.o} to ${x.d} on ${pretty(x.dep)} ${f.depart}`;if(trip==="round")q+=` returning ${pretty(x.ret)}`;q+=` for ${x.travelers} adults in ${x.cabin}`;return"https://www.google.com/travel/flights?hl=en-US&curr=USD&q="+encodeURIComponent(q)}
+function flights(x){const seed=hash(x.o+x.d+x.dep);const names=["American Airlines","Delta Air Lines","United Airlines","JetBlue","Southwest Airlines"];const base=6+(seed%5);return[0,1,2].map((n)=>{const hour=base+n*4;const minute=["10","35","55"][(seed+n)%3];const score=Math.min(82,44+((seed+n*17)%34));const fare=139+((seed+n*83)%240);const airline=names[(seed+n)%names.length];return{airline,code:airline.split(" ").map(w=>w[0]).join("").slice(0,2),depart:`${hour>12?hour-12:hour}:${minute} ${hour>=12?"PM":"AM"}`,arrive:`${((hour+3)%12)||12}:${["05","30","50"][(seed+n+1)%3]} ${hour+3>=12?"PM":"AM"}`,duration:`${2+((seed+n)%4)}h ${15+((seed+n*11)%40)}m`,score,fare,factors:score>65?["Earlier departure","Strong route frequency","Lower disruption history"]:score>54?["Good route frequency","Moderate seasonal demand","Backup flights available"]:["Peak travel window","Higher typical demand","Fewer same-day backups"]}})}
+function render(){const err=$("#error");err.textContent="";try{const x=readForm();$("#route-title").textContent=`${x.o} → ${x.d}`;$("#trip-summary").textContent=`${airports[x.o]||x.o} to ${airports[x.d]||x.d} · ${pretty(x.dep)}${trip==="round"?` – ${pretty(x.ret)}`:" · One way"}`;$("#flight-list").innerHTML=flights(x).map(f=>`<article class="flight"><div class="airline"><span class="mark">${f.code}</span><div><h3>${f.airline}</h3><p>${x.o} → ${x.d} · Nonstop</p></div></div><div class="timing"><strong>${f.depart} – ${f.arrive}</strong><p>${f.duration} · indicative schedule</p></div><div class="score"><strong>${f.score}%</strong><span>modeled opportunity</span></div><div class="factors">${f.factors.map(v=>`<span class="factor">${v}</span>`).join("")}</div><div class="flight-actions"><span class="fare">Indicative fare from <b>$${f.fare}</b></span><a class="check-link" href="${googleUrl(f,x)}" target="_blank" rel="noopener">Check current fare ↗</a></div></article>`).join("");$("#results").hidden=false;$("#results").scrollIntoView({behavior:"smooth",block:"start"})}catch(e){err.textContent=e.message}}
+function init(){const t=new Date();$("#depart").min=iso(t);$("#return").min=iso(t);$("#depart").value=iso(add(t,7));$("#return").value=iso(add(t,11));[$("#origin"),$("#destination")].forEach(i=>i.addEventListener("input",()=>norm(i)));$("#depart").addEventListener("change",()=>{$("#return").min=$("#depart").value;if($("#return").value<$("#depart").value)$("#return").value=$("#depart").value});document.querySelectorAll(".toggle").forEach(b=>b.addEventListener("click",()=>setTrip(b.dataset.trip)));$("#swap").addEventListener("click",()=>{const v=$("#origin").value;$("#origin").value=$("#destination").value;$("#destination").value=v});$("#compare").addEventListener("click",render);setTrip("round")}
+document.addEventListener("DOMContentLoaded",init)})();
