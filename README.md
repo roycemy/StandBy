@@ -1,76 +1,46 @@
 # StandBy
 
-**See where you can go this week.**
+StandBy is moving from a simulated demo to an honest live flight-search and standby intelligence product.
 
-StandBy is a flexible-flight discovery app for travelers who care more about price
-than exact timing. Instead of asking for one exact date and airport, you tell it
-roughly where and when you can travel - and it ranks the cheap, realistic options
-by both price and the odds the trip goes smoothly.
+**Live beta:** https://roycemy.github.io/StandBy/
 
-> **Prototype notice:** this MVP runs entirely on **simulated data**. No live
-> fares, seat maps, or airline systems are connected, and the in-app checkout is
-> a simulation - no real ticket is ever purchased. The point of the prototype is
-> the ranking model and the product flow, not real inventory.
+## What works now
 
-## The two ways in
+- Search form for route, trip dates, travelers, and cabin
+- Handoff to Google Flights for current schedules, displayed fares, stops, duration, and real booking links
+- No invented open-seat counts, passenger loads, or standby probabilities
+- A Python collection framework with SQLite history, provider gates, backoff-friendly delays, run logs, prediction storage, and alert output
+- A four-times-daily GitHub Actions schedule at staggered minutes
 
-1. **Search mode** - "I need to reach Dallas sometime Tue-Fri, from BOS or PVD."
-   You give a destination, a date range, one or more departure airports, and
-   whether you care more about price or schedule. StandBy returns the best
-   confirmed cheap tickets, nearby-airport and flexible-date combinations, and
-   same-day standby or change options - each with a confidence score and a
-   fallback if the risky plan fails.
+## The compliance boundary
 
-2. **Discovery mode** - "Show me the best flights I could realistically take."
-   No destination needed. StandBy browses the simulated market and ranks
-   opportunity cards ("Nashville - Friday - 87% - $79") by price, confidence,
-   schedule, destination appeal, and backup options.
+The collector does not scrape any airline or travel site by default. A provider runs only when all of these are true in `providers.json`:
 
-## How the confidence score works (simulated model)
+1. `enabled` is true
+2. `terms_reviewed` is true
+3. `automation_permitted` is true
+4. A required credential is present
+5. Its official response schema has a reviewed adapter
 
-Each flight gets a 0-100 confidence score from five weighted inputs:
+A CAPTCHA, robots restriction, blocked request, login wall, or terms prohibition is a stop signal. StandBy does not bypass controls, rotate IPs, or disguise traffic. The scheduler uses four spaced runs per day, one run at a time, plus source-specific delays. A provider's stricter published limit always wins.
 
-| Input | What it represents | Weight |
-| --- | --- | --- |
-| Fare position | Price vs. the route's recent median | 30% |
-| Open seats | Estimated unsold seats on the flight | 25% |
-| Load trend | Whether the flight is filling or emptying | 15% |
-| Disruption risk | Cancellation / delay history for the flight | 15% |
-| Backup options | Later same-day flights that could catch you | 15% |
+## Data model
 
-In the prototype every input is generated deterministically from the route,
-date, and flight number, so the demo is stable between reloads. The scoring
-function in `app.js` (`scoreFlight`) is the seam where real feeds (fare
-search, seat availability, flight-status history) would plug in later.
+Each observation preserves source, timestamp, route, departure, carrier, flight number, displayed price, booking class, bookable status, seat availability when the provider legitimately supplies it, and a source URL. Missing fields remain `null`.
 
-## The standby layer
+The baseline probability model refuses to emit a result without at least eight legitimate seat-history observations. Its output is labeled low or medium confidence and keeps the exact inputs used. It is a starting baseline, not a claim about airline standby priority.
 
-After you "book" a flight in the simulator, StandBy shows the second half of
-the product: for each alternative same-day flight, the estimated odds of a
-same-day standby or change clearing, based on open seats, your fare class, and
-airline rules. Real airline rules treat standby as a change to an existing
-eligible ticket, not a standalone product - so the flow sells the confirmed
-ticket first and manages flexibility afterward.
-
-## Run it
-
-No build step. Open `index.html` in a browser, or serve the folder:
+## Run locally
 
 ```bash
-python3 -m http.server 8000
-# then visit http://localhost:8000
+python standby_pipeline.py status
+python standby_pipeline.py collect
 ```
 
-## Files
+The default run is safe and produces a skipped-provider report because no source is approved or credentialed yet.
 
-- `index.html` - single-page shell
-- `styles.css` - dark, aviation-inspired UI
-- `data.js` - deterministic simulated flight market (routes, airlines, fares)
-- `app.js` - scoring engine, search/discovery UI, simulated checkout + standby
+## What is still required
 
-## Roadmap (what real data would unlock)
+Choose a provider that contractually permits automated collection and consumer display of live fares, booking-class/seat availability, and derived probability scores. Add its credential as the `STANDBY_PROVIDER_KEY` repository secret, complete its official schema adapter, and turn on the three permission gates.
 
-- Live fare search and nearby-airport/date expansion
-- Real seat-availability and load-factor signals
-- Airline-specific standby / same-day-change rules per fare class
-- Purchase through real ticketing rails, then monitored flexibility alerts
+Actual standby lists, passenger loads, employee/non-rev priority, and clearance order are airline-controlled. If a provider cannot license those fields, StandBy can model a route-level opportunity indicator from permitted availability history, but must not call it a true standby probability.
