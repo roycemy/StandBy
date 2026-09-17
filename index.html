@@ -1,63 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Compare modeled standby opportunity across flights, then check current fares.">
-<title>StandBy - Compare flight opportunity</title>
-<link rel="stylesheet" href="styles.css?v=20260916b">
-</head>
-<body>
-<header class="site-header">
-  <a class="brand" href="#top" aria-label="StandBy home">StandBy</a>
-  <span class="beta"><i></i> Modeled beta</span>
-</header>
-<main id="top" class="shell">
-  <section class="hero">
-    <p class="eyebrow">Plan the flight. See the tradeoffs.</p>
-    <h1>Find your best shot.</h1>
-    <p>Compare an honest, modeled opportunity estimate across flights. No fake seat counts. No pretending we can see an airline's standby list.</p>
-  </section>
-
-  <section class="search-card" aria-label="Flight search">
-    <div class="trip-toggle" role="group" aria-label="Trip type">
-      <button class="toggle on" data-trip="round" type="button">Round trip</button>
-      <button class="toggle" data-trip="oneway" type="button">One way</button>
-    </div>
-    <div class="route-row">
-      <label>From<input id="origin" value="BOS" maxlength="3" autocomplete="off" aria-label="Origin airport code"></label>
-      <button id="swap" class="swap" type="button" aria-label="Swap airports">⇄</button>
-      <label>To<input id="destination" value="DFW" maxlength="3" autocomplete="off" aria-label="Destination airport code"></label>
-    </div>
-    <div class="detail-grid">
-      <label>Depart<input id="depart" type="date"></label>
-      <label id="return-wrap">Return<input id="return" type="date"></label>
-      <label>Travelers<select id="travelers"><option>1</option><option>2</option><option>3</option><option>4</option></select></label>
-      <label>Cabin<select id="cabin"><option value="economy">Economy</option><option value="premium economy">Premium economy</option><option value="business">Business</option><option value="first">First</option></select></label>
-    </div>
-    <button id="compare" class="primary" type="button">Compare flight opportunities</button>
-    <p id="error" class="error" role="alert"></p>
-  </section>
-
-  <section id="results" class="results" hidden aria-live="polite">
-    <div class="results-head">
-      <div><p class="eyebrow">Modeled results</p><h2 id="route-title">BOS to DFW</h2><p id="trip-summary"></p></div>
-      <span class="estimate-label">Estimates, not live loads</span>
-    </div>
-    <div id="flight-list" class="flight-list"></div>
-    <aside class="honesty">
-      <strong>What this score means</strong>
-      <p>Opportunity scores are directional model estimates based on route demand, typical capacity, schedule timing, seasonality, and disruption history. They are not live open-seat counts, airline standby lists, or guaranteed clearance odds. Current fares and schedules must be checked with the provider.</p>
-    </aside>
-  </section>
-
-  <section class="truth-strip">
-    <article><b>Shown here</b><span>Airline, route, timing, indicative fare and modeled opportunity factors.</span></article>
-    <article><b>Checked live</b><span>Current fare and schedule on Google Flights after you choose an option.</span></article>
-    <article><b>Not claimed</b><span>Live seats, passenger loads, standby priority or guaranteed clearance.</span></article>
-  </section>
-</main>
-<footer>StandBy is a planning tool. Airlines control standby eligibility and clearance. Verify fare rules and same-day policy before purchase.</footer>
-<script src="app.js?v=20260916b"></script>
-</body>
-</html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="description" content="Plan a real same-day standby attempt without fake loads or fares."><title>StandBy - Plan your standby attempt</title><link rel="stylesheet" href="styles.css?v=20260916c"></head>
+<body><header class="site-header"><a class="brand" href="#top">StandBy</a><span class="beta"><i></i> Modeled beta</span></header>
+<main id="top" class="shell"><section class="hero"><p class="eyebrow">Day-of-travel decision support</p><h1>Know your path before you list.</h1><p>Standby is not a cheap replacement ticket. Start with how you are traveling, then compare eligibility, timing, priority factors, and backup flights.</p></section>
+<section class="planner" aria-label="Standby planner"><div class="mode-picker"><button class="mode on" data-mode="ticketed"><b>I have a confirmed ticket</b><span>Same-day standby</span></button><button class="mode" data-mode="pass"><b>I travel on a pass</b><span>Employee, buddy or non-rev</span></button></div>
+<div class="context" id="mode-note"><strong>Ticketed traveler</strong><span>You keep your confirmed flight while trying for another eligible flight on the same travel day. Airline and fare rules control what is allowed.</span></div>
+<div class="form-grid"><label>Airline<select id="airline"><option>American Airlines</option><option>Delta Air Lines</option><option>Southwest Airlines</option><option>United Airlines</option><option>Other airline</option></select></label><label>Travel date<input id="depart" type="date"></label><label>From<input id="origin" value="BOS" maxlength="3"></label><label>To<input id="destination" value="DFW" maxlength="3"></label><label id="ticket-wrap" class="wide">Original confirmed flight<input id="confirmed" placeholder="e.g. AA 2294 at 3:40 PM"></label><label id="pass-wrap" class="wide" hidden>Pass relationship<select id="pass-type"><option>Employee / retiree</option><option>Registered companion</option><option>Buddy pass / guest</option><option>Interline / other pass</option></select></label></div>
+<button id="compare" class="primary">Build my standby plan</button><p id="error" class="error"></p></section>
+<section id="results" class="results" hidden aria-live="polite"><div class="results-head"><div><p class="eyebrow">Your standby plan</p><h2 id="route-title">BOS → DFW</h2><p id="summary"></p></div><span class="estimate-label">No live loads</span></div><div id="result-body"></div></section>
+<section class="truth-strip"><article><b>What matters</b><span>Eligibility, listing window, airline priority rules, flight sequence and same-day backups.</span></article><article><b>What price means</b><span>Only a documented change fee, fare difference, tax or pass charge. There is no invented “standby fare.”</span></article><article><b>What we do not have yet</b><span>Live inventory, employee load tools, standby-list position or a guaranteed clearance probability.</span></article></section></main>
+<footer>Airlines control eligibility, list order and clearance. Recheck the operating airline’s current rules before travel.</footer><script src="app.js?v=20260916c"></script></body></html>
